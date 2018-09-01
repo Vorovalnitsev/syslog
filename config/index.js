@@ -24,6 +24,7 @@ module.exports.getMySqlConnectionStringProduction = getMySqlConnectionStringProd
 
 //Настройки создания UDP сокеда для получения сообщений от устройств
 
+
 function getSyslogSocketParameterTest() {
     return {
         address: 'localhost',
