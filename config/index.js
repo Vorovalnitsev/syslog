@@ -35,8 +35,8 @@ function getSyslogSocketParameterTest() {
 
 function getSyslogSocketParameterProduction() {
     return {
-        address: '207.154.224.201',
-        port: '514',
+        address: 'localhost',
+        port: '1514',
         exclusive: 'false'
     }
 }
