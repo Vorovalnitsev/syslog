@@ -8,10 +8,10 @@ let syslogSocketParameter;
 //проверяем переменные окружения
 switch (process.env.NODE_ENV){
     case 'production':
-        syslogSocketParameter = config.getSyslogSocketParameterTest;
+        syslogSocketParameter = config.getSyslogSocketParameterProduction;
         break;
     default:
-        syslogSocketParameter = config.getSyslogSocketParameterProduction;
+        syslogSocketParameter = config.getSyslogSocketParameterTest;
         break;
 }
 
