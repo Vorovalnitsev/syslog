@@ -34,7 +34,7 @@ syslog(syslogSocketParameter, function (record) {
 
     let idHost = null;
     let idClient = null;
-    let mac = record.message.match(/[A-F0-9][A-F0-9]:[A-F0-9][A-F0-9]:[A-F0-9][A-F0-9]:[A-F0-9][A-F0-9]:[A-F0-9][A-F0-9]:[A-F0-9][A-F0-9]/);
+    let mac = record.message.match(/[a-fA-F0-9][a-fA-F0-9]:[a-fA-F0-9][a-fA-F0-9]:[a-fA-F0-9][a-fA-F0-9]:[a-fA-F0-9][a-fA-F0-9]:[a-fA-F0-9][a-fA-F0-9]:[a-fA-F0-9][a-fA-F0-9]/);
 
     async.waterfall([
         function (callback) {
