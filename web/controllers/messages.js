@@ -17,7 +17,7 @@ module.exports.getNotAcknowledgedMessages = function getNotAcknowledgedMessages(
 }
 
 module.exports.getNotAcknowledgedMessagesFromQuantity = function getNotAcknowledgedMessagesFromQuantity(req, res) {
-    controllerMessages.getNotAcknowledgedMessages(req.params.from, req.params.quantity, function (result) {
+    controllerMessages.getNotAcknowledgedMessagesFromQuantity(req.params.from, req.params.quantity, function (result) {
         res.send(result);
     });
 }

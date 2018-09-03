@@ -74,7 +74,7 @@ module.exports.getCountNotAcknowledgedMessages = function getCountNotAcknowledge
 }
 
 //возвращаем не просмотренные сообщения
-module.exports.getNotAcknowledgedMessages = function getNotAcknowledgedMessages(from, quantity,callback) {
+module.exports.getNotAcknowledgedMessagesFromQuantity = function getNotAcknowledgedMessagesFromQuantity(from, quantity, callback) {
 
     let sql = 'SELECT ' +
         'messages.id as id, ' +
@@ -91,7 +91,7 @@ module.exports.getNotAcknowledgedMessages = function getNotAcknowledgedMessages(
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
             date = new Date();
-            console.log(date + ' Syslog - Error select records. Function getNotAcknowledgedMessages');
+            console.log(date + ' Syslog - Error select records. Function getNotAcknowledgedMessagesFromQuantity');
             console.log(err);
             return callback(null);
         }
@@ -111,7 +111,7 @@ module.exports.getMessagesFromQuantity = function getMessagesFromQuantity(from, 
         'hosts.hostname as hostname,' +
         'DATE_FORMAT(messages.acknowledgedDate, \'%d.%m.%Y %T\') as acknowledgedDate, ' +
         'messages.acknowledged ' +
-        'FROM messages, hosts WHERE messages.idHost = hosts.id ORDER BY createdDate DESC LIMIT ' + from + ', ' + quantity;
+        'FROM messages, hosts WHERE messages.idHost = hosts.id ORDER BY id DESC LIMIT ' + from + ', ' + quantity;
     let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
@@ -176,15 +176,35 @@ module.exports.insertIntoClients = function insertIntoClients (mac, callback){
             date = new Date();
             console.log(date + ' Syslog - Error insert a record to the table Clients.');
             console.log(err);
-            return;
+            return(null);
         }
         return callback(result);
     });
 }
 
+//обновляем запись в таблице clients
+module.exports.updateClient = function updateClient (id, hostname, callback){
+    let sql = 'UPDATE clients SET hostname = ' + mySqlConnection.escape(hostname) + ', ' +
+        'acknowledged = true ' +
+        'WHERE id = ' + id;
+    let date;
+
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error update a record to the table Clients.');
+            console.log(err);
+            return callback(null);
+        }
+        module.exports.getClientById(id, function (result) {
+            return callback(result);
+        })
+    });
+}
+
 //возвращаем количество новых клиентов
 module.exports.getCountNotAcknowledgedClients = function getCountNotAcknowledgedClients(callback) {
-    let sql = 'SELECT COUNT(*) as count FROM syslog.clients WHERE acknowledged = FALSE;';
+    let sql = 'SELECT COUNT(*) as count FROM syslog.clients WHERE acknowledged = false;';
     let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
@@ -204,7 +224,53 @@ module.exports.getClientByMac = function getClientByMac (mac, callback) {
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
             date = new Date();
-            console.log(date + ' Syslog - Error select a record from the table Clients.');
+            console.log(date + ' Syslog - Error select a record from the table Clients. Function is getClientByMac');
+            console.log(err);
+            return;
+        }
+        return callback(result[0]);
+    });
+}
+
+// получаем записи из таблицы clients с указанной позиции указанное количество
+module.exports.getClientsFromQuantity = function getClientsFromQuantity (from, quantity, callback){
+    let sql = 'SELECT * FROM clients LIMIT ' + from + ', ' + quantity;
+    let date;
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records to the table CLients. Function is getClientsFromQuantity ');
+            console.log(err);
+            return;
+        }
+        return callback(result);
+    });
+}
+
+//возвращаем не просмотренные mac адреса
+module.exports.getNotAcknowledgedClientsFromQuantity = function getNotAcknowledgedClientsFromQuantity(from, quantity, callback) {
+
+    let sql = 'SELECT * FROM clients WHERE acknowledged = false LIMIT ' + from + ', ' + quantity;
+    let date;
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records. Function getNotAcknowledgedClientsFromQuantity');
+            console.log(err);
+            return callback(null);
+        }
+        return callback(result);
+    });
+}
+
+// получаем запись из таблицы clients по id
+module.exports.getClientById = function getClientById (id, callback){
+    let sql = 'SELECT * FROM clients WHERE id =  ' + id;
+    let date;
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select a record from the table CLients. Function is getClientById ');
             console.log(err);
             return;
         }
@@ -242,3 +308,4 @@ module.exports.insertIntoHosts = function insertIntoHosts (hostname, callback){
         return callback(result);
     });
 }
+

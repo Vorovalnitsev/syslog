@@ -1,0 +1,39 @@
+<table class="table table-hover" id="clients">
+    <thead>
+    <th>
+        id
+    </th>
+    <th>
+        MAC
+    </th>
+    <th>
+        Hostname
+    </th>
+    </thead>
+</table>
+
+<div class="modal fade" id="editClientModal" tabindex="-1" role="dialog" aria-labelledby="editClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editClientModalLabel">Edit client</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="client-hostname" class="col-form-label">Hostname:</label>
+                        <input type="text" class="form-control" id="hostnameClient">
+                        <input type="hidden" id="idClient" value="">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveClient">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

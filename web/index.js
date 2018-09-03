@@ -15,7 +15,6 @@ web.use(bodyParser.urlencoded({extended: false}));
 web.set('views', __dirname + '/views');
 
 
-
 web.engine('handlebars', expressHandlebars({
     defaultLayout : 'main',
     layoutsDir: __dirname + '/views/layouts'
