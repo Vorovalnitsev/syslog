@@ -59,7 +59,7 @@ module.exports.insertIntoMessages = function insertIntoMessages (idHost, facilit
 указываем диапазон записей для выборки
 */
 //возвращаем количество не просмотренных сообщений
-module.exports.getCountNotAcknowledgedMessages = function getCountNotAcknowledgedMessages(callback) {
+module.exports.getNotAcknowledgedMessagesCount = function getNotAcknowledgedMessagesCount(callback) {
     let sql = 'SELECT COUNT(*) as count FROM syslog.messages WHERE acknowledged = FALSE';
     let date;
     mySqlConnection.query(sql, function (err, result) {
@@ -203,7 +203,7 @@ module.exports.updateClient = function updateClient (id, hostname, callback){
 }
 
 //возвращаем количество новых клиентов
-module.exports.getCountNotAcknowledgedClients = function getCountNotAcknowledgedClients(callback) {
+module.exports.getNotAcknowledgedClientsCount = function getNotAcknowledgedClientsCount(callback) {
     let sql = 'SELECT COUNT(*) as count FROM syslog.clients WHERE acknowledged = false;';
     let date;
     mySqlConnection.query(sql, function (err, result) {

@@ -24,6 +24,8 @@ module.exports = function (web) {
     web.get('/messages/notacknowledged/:from/:quantity', controllerMessages.getNotAcknowledgedMessagesFromQuantity);
     //Сообщение прочитано
     web.post('/messages/acknowledge/:id', controllerMessages.acknowledgeMessage);
+    //Возвращаем количество непрочитанных сообщений
+    web.get('/messages/getnotacknowledgedcount', controllerMessages.getNotAcknowledgedMessagesCount);
 
 
     //Клиенты
@@ -35,6 +37,9 @@ module.exports = function (web) {
     //Ajax
     //Выводим всех клиентов
     web.get ('/clients/:from/:quantity', controllerClients.getClientsFromQuantity);
+    //Возвращаем количество новых клиентов
+    web.get('/clients/getnotacknowledgedcount', controllerClients.getNotAcknowledgedClientsCount);
+    //Возвращаем клиента по id
     web.get ('/clients/:id', controllerClients.getClientById);
     //Выдаем новые сообщения в указанном диапазаоне
     web.get('/clients/notacknowledged/:from/:quantity', controllerClients.getNotAcknowledgedClientsFromQuantity);

@@ -28,3 +28,9 @@ module.exports.acknowledgeMessage = function acknowledgeMessage(req, res) {
     });
 }
 
+module.exports.getNotAcknowledgedMessagesCount= function getNotAcknowledgedMessagesCount(req, res) {
+    controllerMessages.getNotAcknowledgedMessagesCount(function (result) {
+        res.send({count: result});
+    });
+}
+

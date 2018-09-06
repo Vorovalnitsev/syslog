@@ -11,35 +11,46 @@
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <a class="navbar-brand" href="/">
         <img src="/img/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">
         Syslog
     </a>
-</nav>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Overview</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                   aria-expanded="false">Messages</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/messages">All messages</a>
+                    <a class="dropdown-item" href="/messages/notacknowledged" id="notAcknowledgedMessagesCount">
+                        New messages</a>
+                </div>
+            </li>
 
-<div class="row">
-    <div class="col-sm-2">
-        <ul class="nav flex-column bg-dark">
-            <li class="nav-item">
-                <a class="nav-link" href="/">Обзор</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                   aria-expanded="false">Clients</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/clients">All clients</a>
+                    <a class="dropdown-item" href="/clients/notacknowledged" id="notAcknowledgedClientsCount">
+                        New clients</a>
+                </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/messages">Сообщения</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">MAC-адреса</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="#">Попытки входа</a>
             </li>
 
         </ul>
     </div>
-    <div class="col-10">
-        {{{body}}}
-    </div>
-</div>
+</nav>
+
+{{{body}}}
 
 
 

@@ -36,3 +36,9 @@ module.exports.getNotAcknowledgedClientsFromQuantity = function getNotAcknowledg
         res.send(result);
     });
 }
+
+module.exports.getNotAcknowledgedClientsCount= function getNotAcknowledgedClientsCount(req, res) {
+    controllerClients.getNotAcknowledgedClientsCount(function (result) {
+        res.send({count: result});
+    });
+}

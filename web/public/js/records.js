@@ -57,8 +57,34 @@ function getClients (){
         },
         'json');
 }
+function getNotAcknowledgedMessagesCount (){
+    $.get('/messages/getnotacknowledgedcount',
+        function (data) {
+
+            if (data && data.count !=0)
+                $("#notAcknowledgedMessagesCount").text('New messages (' + data.count + ')');
+            else
+                $("#notAcknowledgedMessagesCount").text('New messages');
+        })
+}
+
+function getNotAcknowledgedClientsCount (){
+    $.get('/clients/getnotacknowledgedcount',
+        function (data) {
+
+            if (data && data.count !=0)
+                $("#notAcknowledgedClientsCount").text('New clients (' + data.count + ')');
+            else
+                $("#notAcknowledgedClientsCount").text('New clients');
+        })
+}
 
 $(document).ready(function () {
+
+    getNotAcknowledgedMessagesCount();
+    getNotAcknowledgedClientsCount();
+
+
     if (document.location.pathname == '/messages' ||
         document.location.pathname == '/messages/notacknowledged' ){
 
@@ -93,8 +119,8 @@ $(document).ready(function () {
                     }
                     else
                         $('#' + id + '>.acknowledgedDate').text(data.acknowledgedDate);
-
                 });
+            getNotAcknowledgedMessagesCount();
         });
     }
 
@@ -135,6 +161,7 @@ $(document).ready(function () {
                         else
                             $('#' + id + '>.hostname').text(data.hostname);
                     }
+                    getNotAcknowledgedClientsCount ();
             });
         });
 
