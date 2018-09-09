@@ -43,9 +43,9 @@ syslog(syslogSocketParameter, function (record) {
                     recordsController.insertIntoHosts(record.hostname, function (result) {
                         if (result)
                             return callback(null,result.insertId);
-                        else return callback(null);
+                        else
+                            return callback(null);
                     });
-
                 }
                 else
                     return callback(null,result.id);

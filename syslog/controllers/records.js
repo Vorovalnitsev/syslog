@@ -24,7 +24,7 @@ mySqlConnection.connect(function(err) {
         date = new Date();
         console.log(date + ' Syslog - Error connect to MySQL.');
         console.log(err);
-        return;
+        return callback(null);;
     }
     date = new Date();
     console.log(date + ' Syslog - MySQL is connected.');
@@ -48,7 +48,7 @@ module.exports.insertIntoMessages = function insertIntoMessages (idHost, facilit
             let date = new Date();
             console.log(date + ' Syslog - Error insert a record to the table Messages.');
             console.log(err);
-            callback(null);;
+            return callback(null);
         }
         return callback(result);
     })
@@ -171,14 +171,23 @@ module.exports.insertIntoClients = function insertIntoClients (mac, callback){
     let date;
 
     mySqlConnection.query(sql, function (err, result) {
-
-        if (err) {
-            date = new Date();
-            console.log(date + ' Syslog - Error insert a record to the table Clients.');
-            console.log(err);
-            return(null);
+        if (err){
+            console.log('1' + result);
+            if (err.code != 'ER_DUP_ENTRY'){
+                date = new Date();
+                console.log(date + ' Syslog - Error insert a record to the table Clients.');
+                console.log(err);
+                return callback(null);
+            }
+            if (err.code == 'ER_DUP_ENTRY')
+                module.exports.getClientByMac(mac, function (result) {
+                    result.insertId = result.id;
+                    console.log('2' + result);
+                    return callback(result);
+                });
         }
-        return callback(result);
+        else
+            return callback(result);
     });
 }
 
@@ -226,7 +235,7 @@ module.exports.getClientByMac = function getClientByMac (mac, callback) {
             date = new Date();
             console.log(date + ' Syslog - Error select a record from the table Clients. Function is getClientByMac');
             console.log(err);
-            return;
+            return callback(null);;
         }
         return callback(result[0]);
     });
@@ -241,7 +250,7 @@ module.exports.getClientsFromQuantity = function getClientsFromQuantity (from, q
             date = new Date();
             console.log(date + ' Syslog - Error select records to the table CLients. Function is getClientsFromQuantity ');
             console.log(err);
-            return;
+            return callback(null);;
         }
         return callback(result);
     });
@@ -272,7 +281,7 @@ module.exports.getClientById = function getClientById (id, callback){
             date = new Date();
             console.log(date + ' Syslog - Error select a record from the table CLients. Function is getClientById ');
             console.log(err);
-            return;
+            return callback(null);;
         }
         return callback(result[0]);
     });
@@ -287,7 +296,7 @@ module.exports.getHostByHostName = function getHostByHostName (hostname, callbac
             date = new Date();
             console.log(date + ' Syslog - Error select a record from the table Hosts. Function is getHostByHostName.');
             console.log(err);
-            return;
+            return callback(null);
         }
         return callback(result[0]);
     });
@@ -298,14 +307,23 @@ module.exports.insertIntoHosts = function insertIntoHosts (hostname, callback){
     let sql = 'INSERT INTO hosts (hostname) VALUES (' + mySqlConnection.escape(hostname) + ')';
     let date;
     mySqlConnection.query(sql, function (err, result) {
-
-        if (err) {
-            date = new Date();
-            console.log(date + ' Syslog - Error insert a record to the table Hosts.');
-            console.log(err);
-            return;
+        if (err){
+            console.log('1' + result);
+            if (err.code != 'ER_DUP_ENTRY'){
+                date = new Date();
+                console.log(date + ' Syslog - Error insert a record to the table Hosts.');
+                console.log(err);
+                return callback(null);
+            }
+            if (err.code == 'ER_DUP_ENTRY')
+                module.exports.getHostByHostName(hostname, function (result) {
+                    result.insertId = result.id;
+                    console.log('2' + result);
+                    return callback(result);
+                });
         }
-        return callback(result);
+            else
+                return callback(result);
     });
 }
 
