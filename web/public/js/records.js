@@ -30,7 +30,7 @@ function getRecords (){
                 if (records){
                     startFrom = startFrom + records.length;
                     records.forEach(function (item , i , arr ){
-                        if (document.location.pathname == '/messages'){
+                        if (document.location.pathname.indexOf('messages') >= 0){
                             $("#messages").append('<tr class="message" id="' + item.id + '">' +
                                 '<td>' + item.id + '</td>' +
                                 '<td>' + item.createdDate + '</td>' +

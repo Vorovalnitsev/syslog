@@ -97,6 +97,7 @@ module.exports.getMessagesByIdClientFromQuantity = function getMessagesFromQuant
         'WHERE messages.idHost = hosts.id  AND ' +
         'messages.idClient = ' + id +' ' +
         'ORDER BY id DESC LIMIT ' + from + ', ' + quantity;
+
     let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
