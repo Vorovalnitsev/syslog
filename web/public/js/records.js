@@ -11,59 +11,63 @@ function getClients(){
         $.get('/clients/all', function (records) {
             if(records)
                 records.forEach(function (item, i, arr) {
-                    $("#clients").append('<a class="dropdown-item" href="/messages/client/' + item.id + '">' +
-                        item.hostname +
-                        '</a>');
+                    $("#clientsSelectMenu").append('<option value="' + item.id + '">' + item.hostname  +'</option>');
             })
         });
-    }
+}
+
 function getRecords (){
     if(document.location.pathname.indexOf('messages') >= 0 ||
         document.location.pathname.indexOf('clients') >= 0 ||
-        document.location.pathname.indexOf('hosts') >= 0
-    ){
-        inProgress = true;
-        $.get(document.location.pathname + '/' +  startFrom + '/' + quantity,
-            function(data) {
-                inProgress = false;
-                let records = data;
-                if (records){
-                    startFrom = startFrom + records.length;
-                    records.forEach(function (item , i , arr ){
-                        if (document.location.pathname.indexOf('messages') >= 0){
-                            $("#messages").append('<tr class="message" id="' + item.id + '">' +
-                                '<td>' + item.id + '</td>' +
-                                '<td>' + item.createdDate + '</td>' +
-                                '<td>' + item.hostname + '</td>' +
-                                '<td>' + item.message + '</td>' +
-                                '</tr>');
-                        }
+        document.location.pathname.indexOf('hosts') >= 0){
+            inProgress = true;
+            let path = document.location.pathname + '/' +  startFrom + '/' + quantity;
 
-                        if (document.location.pathname == '/clients'){
-                            $("#clients").append('<tr class="client" id="' + item.id + '">' +
-                                '<td>' + item.id + '</td>' +
-                                '<td>' + item.mac + '</td>' +
-                                '<td class="hostname">' + item.hostname + '</td>' +
-                                '</tr>');
-                        }
+            if(document.location.pathname.indexOf('messages') >= 0){
+                if($('#clientsSelectMenu').val() != -1)
+                    path='/messages/client/' + $('#clientsSelectMenu').val() + '/' +  startFrom + '/' + quantity;
+            }
+            $.get(path,
+                function(data) {
+                    inProgress = false;
+                    let records = data;
+                    if (records){
+                        startFrom = startFrom + records.length;
+                        records.forEach(function (item , i , arr ){
+                            if (document.location.pathname.indexOf('messages') >= 0){
+                                $("#messages").append('<tr class="message" id="' + item.id + '">' +
+                                    '<td>' + item.id + '</td>' +
+                                    '<td>' + item.createdDate + '</td>' +
+                                    '<td>' + item.hostname + '</td>' +
+                                    '<td>' + item.message + '</td>' +
+                                    '</tr>');
+                            }
 
-                        if (document.location.pathname == '/hosts'){
-                            $("#hosts").append('<tr class="host" id="' + item.id + '">' +
-                                '<td>' + item.id + '</td>' +
-                                '<td>' + item.hostname + '</td>' +
-                                '<td class="comment">' + item.comment + '</td>' +
-                                '</tr>');
-                        }
+                            if (document.location.pathname == '/clients'){
+                                $("#clients").append('<tr class="client" id="' + item.id + '">' +
+                                    '<td>' + item.id + '</td>' +
+                                    '<td>' + item.mac + '</td>' +
+                                    '<td class="hostname">' + item.hostname + '</td>' +
+                                    '</tr>');
+                            }
 
-                    });
+                            if (document.location.pathname == '/hosts'){
+                                $("#hosts").append('<tr class="host" id="' + item.id + '">' +
+                                    '<td>' + item.id + '</td>' +
+                                    '<td>' + item.hostname + '</td>' +
+                                    '<td class="comment">' + item.comment + '</td>' +
+                                    '</tr>');
+                            }
 
-                };
-                if ($(window).height() >= $(document).height() && records.length!=0){
-                    getRecords();
-                }
+                        });
 
-            },
-            'json');
+                    };
+                    if ($(window).height() >= $(document).height() && records.length!=0){
+                        getRecords();
+                    }
+
+                },
+                'json');
     }
 
 }
@@ -150,6 +154,12 @@ $(document).ready(function () {
                 }
             });
     });
+
+    $('#clientsSelectMenu').on('change', function () {
+        $('#messages>tr').remove();
+        startFrom = 0;
+        getRecords();
+    })
 });
 
 
