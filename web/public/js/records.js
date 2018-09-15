@@ -11,7 +11,8 @@ function getClients(){
         $.get('/clients/all', function (records) {
             if(records)
                 records.forEach(function (item, i, arr) {
-                    $("#clientsSelectMenu").append('<option value="' + item.id + '">' + item.hostname  +'</option>');
+                    $("#clientsSelectMenu").append('<option value="' + item.id + '">'+ item.mac + ' - '
+                        + item.hostname  +'</option>');
             })
         });
 }
