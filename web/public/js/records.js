@@ -54,7 +54,6 @@ function getRecords (){
                                     '<td>' + item.message + '</td>' +
                                     '</tr>');
                             }
-
                             if (document.location.pathname == '/clients'){
                                 $("#clients").append('<tr class="client" id="' + item.id + '">' +
                                     '<td>' + item.id + '</td>' +
