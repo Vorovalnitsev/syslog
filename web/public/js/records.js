@@ -42,8 +42,8 @@ function getRecords (){
                                     case 2: color='text-danger'; break;
                                     case 3: color='text-danger'; break;
                                     case 4: color='text-warning'; break;
-                                    case 5: color='text-dark'; break;
-                                    case 6: color='text-success'; break;
+                                    case 5: color='text-success'; break;
+                                    case 6: color='text-dark'; break;
                                     case 7: color='text-secondary'; break;
 
                                 }
