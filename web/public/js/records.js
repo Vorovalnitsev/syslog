@@ -35,7 +35,19 @@ function getRecords (){
                         startFrom = startFrom + records.length;
                         records.forEach(function (item , i , arr ){
                             if (document.location.pathname.indexOf('messages') >= 0){
-                                $("#messages").append('<tr class="message" id="' + item.id + '">' +
+                                let color;
+                                switch (item.severity){
+                                    case 0: color='text-danger'; break;
+                                    case 1: color='text-danger'; break;
+                                    case 2: color='text-danger'; break;
+                                    case 3: color='text-danger'; break;
+                                    case 4: color='text-warning'; break;
+                                    case 5: color='text-dark'; break;
+                                    case 6: color='text-success'; break;
+                                    case 7: color='text-secondary'; break;
+
+                                }
+                                $("#messages").append('<tr class="message ' +color+ '" id="' + item.id + '">' +
                                     '<td>' + item.id + '</td>' +
                                     '<td>' + item.createdDate + '</td>' +
                                     '<td>' + item.hostname + '</td>' +
