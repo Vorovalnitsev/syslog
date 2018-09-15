@@ -2,13 +2,22 @@ const express = require('express');
 const expressHandlebars = require('express-handlebars');
 const favicon = require('serve-favicon');
 const bodyParser = require('body-parser');
-
 const routesIndex = require('./routes/index.js');
+const config = require('../config');
 
 //настройка express
-const PORT_APP = '8080';
-const web = express();
+let webServerParameter;
+//проверяем переменные окружения
+switch (process.env.NODE_ENV){
+    case 'production':
+        webServerParameter = config.getWebServerParameterProduction();
+        break;
+    default:
+        webServerParameter = config.getWebServerParameterTest();
+        break;
+}
 
+const web = express();
 
 web.use(favicon(__dirname + '/public/img/favicon.ico'));
 web.use(bodyParser.urlencoded({extended: false}));
@@ -27,7 +36,9 @@ web.use(express.static(__dirname  +  '/public'));
 
 routesIndex(web);
 
-web.listen(PORT_APP, function () {
+web.listen(webServerParameter, function () {
     let date = new Date();
-    console.log(date +' Web server is started on http://localhost:' + PORT_APP + ' Press Ctrl + C for stop.');
+    console.log(date + ' Web server is started on ' +
+        'http://' + webServerParameter.hostname +':' + webServerParameter.port +
+        ' Press Ctrl + C for stop.');
 });

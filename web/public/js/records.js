@@ -6,143 +6,92 @@ let inProgress = false;
 let startFrom = 0;
 let quantity = 10;
 
-function getMessages (){
-    inProgress = true;
-    $.get(document.location.pathname + '/' +  startFrom + '/' + quantity,
-        function(data) {
-            inProgress = false;
-            let messages = data;
-            if (messages){
-                startFrom = startFrom + messages.length;
-                messages.forEach(function (item , i , arr ){
-                    $("#messages").append('<tr class="message" id="' + item.id + '">' +
-                        '<td>' + item.id + '</td>' +
-                        '<td>' + item.createdDate + '</td>' +
-                        '<td>' + item.hostname + '</td>' +
-                        '<td>' + item.message + '</td>' +
-                        '<td class="acknowledgedDate">' + item.acknowledgedDate + '</td>' +
-                        '</tr>'
-                    );
-                });
-                if ($(window).height() >= $(document).height() && messages.length!=0){
-                    getMessages();
+function getClients(){
+    if(document.location.pathname.indexOf('messages') >= 0)
+        $.get('/clients/all', function (records) {
+            if(records)
+                records.forEach(function (item, i, arr) {
+                    $("#clients").append('<a class="dropdown-item" href="/messages/client/' + item.id + '">' +
+                        item.hostname +
+                        '</a>');
+            })
+        });
+    }
+function getRecords (){
+    if(document.location.pathname.indexOf('messages') >= 0 ||
+        document.location.pathname.indexOf('clients') >= 0 ||
+        document.location.pathname.indexOf('hosts') >= 0
+    ){
+        inProgress = true;
+        $.get(document.location.pathname + '/' +  startFrom + '/' + quantity,
+            function(data) {
+                inProgress = false;
+                let records = data;
+                if (records){
+                    startFrom = startFrom + records.length;
+                    records.forEach(function (item , i , arr ){
+                        if (document.location.pathname == '/messages'){
+                            $("#messages").append('<tr class="message" id="' + item.id + '">' +
+                                '<td>' + item.id + '</td>' +
+                                '<td>' + item.createdDate + '</td>' +
+                                '<td>' + item.hostname + '</td>' +
+                                '<td>' + item.message + '</td>' +
+                                '</tr>');
+                        }
+
+                        if (document.location.pathname == '/clients'){
+                            $("#clients").append('<tr class="client" id="' + item.id + '">' +
+                                '<td>' + item.id + '</td>' +
+                                '<td>' + item.mac + '</td>' +
+                                '<td class="hostname">' + item.hostname + '</td>' +
+                                '</tr>');
+                        }
+
+                        if (document.location.pathname == '/hosts'){
+                            $("#hosts").append('<tr class="host" id="' + item.id + '">' +
+                                '<td>' + item.id + '</td>' +
+                                '<td>' + item.hostname + '</td>' +
+                                '<td class="comment">' + item.comment + '</td>' +
+                                '</tr>');
+                        }
+
+                    });
+
+                };
+                if ($(window).height() >= $(document).height() && records.length!=0){
+                    getRecords();
                 }
 
-            }
-        },
-        'json');
+            },
+            'json');
+    }
+
 }
 
-function getClients (){
-    inProgress = true;
-    $.get(document.location.pathname + '/' +  startFrom + '/' + quantity,
-        function(data) {
-            inProgress = false;
-            let clients = data;
-            if (clients){
-                startFrom = startFrom + clients.length;
-                clients.forEach(function (item , i , arr ){
-                    $("#clients").append('<tr class="clients" id="' + item.id + '">' +
-                        '<td>' + item.id + '</td>' +
-                        '<td>' + item.mac + '</td>' +
-                        '<td class="hostname">' + item.hostname + '</td>' +
-                        '</tr>'
-                    );
-                });
-                if ($(window).height() >= $(document).height() && clients.length!=0){
-                    getClients();
-                }
 
-            }
-        },
-        'json');
-}
-function getNotAcknowledgedMessagesCount (){
-    $.get('/messages/getnotacknowledgedcount',
-        function (data) {
-
-            if (data && data.count !=0)
-                $("#notAcknowledgedMessagesCount").text('New messages (' + data.count + ')');
-            else
-                $("#notAcknowledgedMessagesCount").text('New messages');
-        })
-}
-
-function getNotAcknowledgedClientsCount (){
-    $.get('/clients/getnotacknowledgedcount',
-        function (data) {
-
-            if (data && data.count !=0)
-                $("#notAcknowledgedClientsCount").text('New clients (' + data.count + ')');
-            else
-                $("#notAcknowledgedClientsCount").text('New clients');
-        })
-}
 
 $(document).ready(function () {
-
-    getNotAcknowledgedMessagesCount();
-    getNotAcknowledgedClientsCount();
-
-
-    if (document.location.pathname == '/messages' ||
-        document.location.pathname == '/messages/notacknowledged' ){
-
-        getMessages();
-
+        getClients()
+        getRecords();
         $(window).scroll(function () {
             if($(window).scrollTop() + $(window).height() >= $(document).height() - 200
                 && !inProgress
-                && document.location.pathname != '/messages/notacknowledged'
             ) {
-                getMessages();
+                getRecords();
             }
         });
 
         $(window).resize(function () {
             if($(window).height() >= $(document).height()
                 && !inProgress
-                && document.location.pathname != '/messages/notacknowledged') {
-                getMessages();
+            ) {
+                getRecords();
             }
         });
 
         $('#messages').on('click', 'tr', function () {
             let id = $(this).attr('id');
-            if (id)
-                $.post('/messages/acknowledge/' + id, function (data) {
-                    if (data &&  document.location.pathname == '/messages/notacknowledged'){
-                        $('#' + id).remove();
-                        startFrom = startFrom - 1;
-                        if (startFrom == 0)
-                            getMessages();
-                    }
-                    else
-                        $('#' + id + '>.acknowledgedDate').text(data.acknowledgedDate);
-                });
-            getNotAcknowledgedMessagesCount();
-        });
-    }
-
-    if (document.location.pathname == '/clients' ||
-        document.location.pathname == '/clients/notacknowledged' ){
-
-        getClients();
-
-        $(window).scroll(function () {
-            if($(window).scrollTop() + $(window).height() >= $(document).height() - 200
-                && !inProgress
-                && document.location.pathname != '/clients/notacknowledged') {
-                getClients();
-            }
-        });
-
-        $(window).resize(function () {
-            if($(window).height() >= $(document).height()
-                && !inProgress
-                && document.location.pathname != '/clients/notacknowledged') {
-                getClients();
-            }
+            alert (id);
         });
 
         $('#saveClient').on('click', function () {
@@ -152,16 +101,8 @@ $(document).ready(function () {
                 function (data) {
                     if (data){
                         $('#editClientModal').modal('hide');
-                        if (document.location.pathname == '/clients/notacknowledged'){
-                            $('#' + id).remove();
-                            startFrom = startFrom - 1;
-                            if (startFrom = 0 )
-                                getClients();
-                            }
-                        else
                             $('#' + id + '>.hostname').text(data.hostname);
                     }
-                    getNotAcknowledgedClientsCount ();
             });
         });
 
@@ -180,7 +121,35 @@ $(document).ready(function () {
                 });
 
         });
-    }
+
+
+    $('#hosts').on('click', 'tr', function () {
+        let id = $(this).attr('id');
+        if (id)
+            $.get('/hosts/' + id,
+                function(data) {
+                    let modalEditHost = $('#editHostModal');
+                    if (data){
+                        modalEditHost.find('#editHostModalLabel').text('Edit ID - ' + id + '  Hostname - ' + data.hostname);
+                        modalEditHost.find('#commentHost').val(data.comment);
+                        modalEditHost.find('#idHost').val(data.id);
+                        $('#editHostModal').modal('show');
+                    }
+                });
+
+    });
+
+    $('#saveHost').on('click', function () {
+        let modalEditHost = $('#editHostModal');
+        let id = modalEditHost.find('#idHost').val();
+        $.post('/hosts/' + id + '/update', {comment: modalEditHost.find('#commentHost').val()},
+            function (data) {
+                if (data){
+                    $('#editHostModal').modal('hide');
+                    $('#' + id + '>.comment').text(data.comment);
+                }
+            });
+    });
 });
 
 

@@ -58,47 +58,6 @@ module.exports.insertIntoMessages = function insertIntoMessages (idHost, facilit
 выбираем записи из таблицы messages
 указываем диапазон записей для выборки
 */
-//возвращаем количество не просмотренных сообщений
-module.exports.getNotAcknowledgedMessagesCount = function getNotAcknowledgedMessagesCount(callback) {
-    let sql = 'SELECT COUNT(*) as count FROM syslog.messages WHERE acknowledged = FALSE';
-    let date;
-    mySqlConnection.query(sql, function (err, result) {
-        if (err) {
-            date = new Date();
-            console.log(date + ' Syslog - Error select records. Function getCountNotAcknowledgedMessages');
-            console.log(err);
-            return callback(0);
-        }
-        return callback(result[0].count);
-    });
-}
-
-//возвращаем не просмотренные сообщения
-module.exports.getNotAcknowledgedMessagesFromQuantity = function getNotAcknowledgedMessagesFromQuantity(from, quantity, callback) {
-
-    let sql = 'SELECT ' +
-        'messages.id as id, ' +
-        'messages.facility as facility, ' +
-        'messages.severity as severity, ' +
-        'DATE_FORMAT(messages.createdDate, \'%d.%m.%Y %T\') as createdDate, ' +
-        'messages.message as message, ' +
-        'hosts.hostname as hostname,' +
-        'DATE_FORMAT(messages.acknowledgedDate, \'%d.%m.%Y %T\') as acknowledgedDate, ' +
-        'messages.acknowledged ' +
-        'FROM messages, hosts WHERE messages.idHost = hosts.id AND acknowledged = false ' +
-        'ORDER BY createdDate DESC LIMIT ' + from + ', ' + quantity;
-    let date;
-    mySqlConnection.query(sql, function (err, result) {
-        if (err) {
-            date = new Date();
-            console.log(date + ' Syslog - Error select records. Function getNotAcknowledgedMessagesFromQuantity');
-            console.log(err);
-            return callback(null);
-        }
-        return callback(result);
-    });
-}
-
 //возвращаем сообщения в указаном диапазоне
 module.exports.getMessagesFromQuantity = function getMessagesFromQuantity(from, quantity, callback) {
 
@@ -108,10 +67,10 @@ module.exports.getMessagesFromQuantity = function getMessagesFromQuantity(from, 
         'messages.severity as severity, ' +
         'DATE_FORMAT(messages.createdDate, \'%d.%m.%Y %T\') as createdDate, ' +
         'messages.message as message, ' +
-        'hosts.hostname as hostname,' +
-        'DATE_FORMAT(messages.acknowledgedDate, \'%d.%m.%Y %T\') as acknowledgedDate, ' +
-        'messages.acknowledged ' +
-        'FROM messages, hosts WHERE messages.idHost = hosts.id ORDER BY id DESC LIMIT ' + from + ', ' + quantity;
+        'hosts.hostname as hostname ' +
+        'FROM messages, hosts ' +
+        'WHERE messages.idHost = hosts.id  ' +
+        'ORDER BY id DESC LIMIT ' + from + ', ' + quantity;
     let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
@@ -123,6 +82,33 @@ module.exports.getMessagesFromQuantity = function getMessagesFromQuantity(from, 
         return callback(result);
     });
 }
+
+//возвращаем сообщения в указаном диапазоне для клиета по Id
+module.exports.getMessagesByIdClientFromQuantity = function getMessagesFromQuantity(id, from, quantity, callback) {
+
+    let sql = 'SELECT ' +
+        'messages.id as id, ' +
+        'messages.facility as facility, ' +
+        'messages.severity as severity, ' +
+        'DATE_FORMAT(messages.createdDate, \'%d.%m.%Y %T\') as createdDate, ' +
+        'messages.message as message, ' +
+        'hosts.hostname as hostname ' +
+        'FROM messages, hosts ' +
+        'WHERE messages.idHost = hosts.id  AND ' +
+        'messages.idClient = ' + id +' ' +
+        'ORDER BY id DESC LIMIT ' + from + ', ' + quantity;
+    let date;
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records. Function getMessagesByIdClientFromQuantity');
+            console.log(err);
+            return callback(null);
+        }
+        return callback(result);
+    });
+}
+
 //возвращает сообщение по Id
 module.exports.getMessageById = function getMessageById (id, callback){
     let sql = 'SELECT ' +
@@ -131,9 +117,7 @@ module.exports.getMessageById = function getMessageById (id, callback){
         'messages.severity as severity, ' +
         'DATE_FORMAT(messages.createdDate, \'%d.%m.%Y %T\') as createdDate, ' +
         'messages.message as message, ' +
-        'hosts.hostname as hostname,' +
-        'DATE_FORMAT(messages.acknowledgedDate, \'%d.%m.%Y %T\') as acknowledgedDate, ' +
-        'messages.acknowledged ' +
+        'hosts.hostname as hostname ' +
         'FROM messages, hosts WHERE messages.idHost = hosts.id AND messages.id = ' + id;
     let date;
     mySqlConnection.query(sql, function (err, result) {
@@ -147,24 +131,6 @@ module.exports.getMessageById = function getMessageById (id, callback){
     });
 }
 
-//устанавливает, что сообщение прочитано
-module.exports.setAcknowledgeMessage = function setAcknowledgeMessage(id, callback) {
-    let date = new Date();
-    let sql = 'UPDATE messages SET acknowledged = true, acknowledgedDate = ' + mySqlConnection.escape(date) +
-        ' WHERE id = ' + id + ' AND acknowledged = false';
-    mySqlConnection.query(sql, function (err, result) {
-        if (err) {
-            date = new Date();
-            console.log(date + ' Syslog - Error update records. Function setAcknowledgeMessage');
-            console.log(err);
-            return callback(null);
-        }
-        module.exports.getMessageById(id, function (result) {
-            return callback(result);
-        })
-    });
-}
-
 //добавляем запись в таблицу clients
 module.exports.insertIntoClients = function insertIntoClients (mac, callback){
     let sql = 'INSERT INTO clients (mac) VALUES (' + mySqlConnection.escape(mac) + ')';
@@ -172,7 +138,6 @@ module.exports.insertIntoClients = function insertIntoClients (mac, callback){
 
     mySqlConnection.query(sql, function (err, result) {
         if (err){
-            console.log('1' + result);
             if (err.code != 'ER_DUP_ENTRY'){
                 date = new Date();
                 console.log(date + ' Syslog - Error insert a record to the table Clients.');
@@ -182,47 +147,11 @@ module.exports.insertIntoClients = function insertIntoClients (mac, callback){
             if (err.code == 'ER_DUP_ENTRY')
                 module.exports.getClientByMac(mac, function (result) {
                     result.insertId = result.id;
-                    console.log('2' + result);
                     return callback(result);
                 });
         }
         else
             return callback(result);
-    });
-}
-
-//обновляем запись в таблице clients
-module.exports.updateClient = function updateClient (id, hostname, callback){
-    let sql = 'UPDATE clients SET hostname = ' + mySqlConnection.escape(hostname) + ', ' +
-        'acknowledged = true ' +
-        'WHERE id = ' + id;
-    let date;
-
-    mySqlConnection.query(sql, function (err, result) {
-        if (err) {
-            date = new Date();
-            console.log(date + ' Syslog - Error update a record to the table Clients.');
-            console.log(err);
-            return callback(null);
-        }
-        module.exports.getClientById(id, function (result) {
-            return callback(result);
-        })
-    });
-}
-
-//возвращаем количество новых клиентов
-module.exports.getNotAcknowledgedClientsCount = function getNotAcknowledgedClientsCount(callback) {
-    let sql = 'SELECT COUNT(*) as count FROM syslog.clients WHERE acknowledged = false;';
-    let date;
-    mySqlConnection.query(sql, function (err, result) {
-        if (err) {
-            date = new Date();
-            console.log(date + ' Syslog - Error select records. Function getCountNotAcknowledgedClients');
-            console.log(err);
-            return callback(0);
-        }
-        return callback(result[0].count);
     });
 }
 
@@ -256,17 +185,16 @@ module.exports.getClientsFromQuantity = function getClientsFromQuantity (from, q
     });
 }
 
-//возвращаем не просмотренные mac адреса
-module.exports.getNotAcknowledgedClientsFromQuantity = function getNotAcknowledgedClientsFromQuantity(from, quantity, callback) {
-
-    let sql = 'SELECT * FROM clients WHERE acknowledged = false LIMIT ' + from + ', ' + quantity;
+// получаем все записи из таблицы clients
+module.exports.getAllClients = function getAllClients (callback){
+    let sql = 'SELECT * FROM clients';
     let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
             date = new Date();
-            console.log(date + ' Syslog - Error select records. Function getNotAcknowledgedClientsFromQuantity');
+            console.log(date + ' Syslog - Error select records to the table CLients. Function is getAllClients ');
             console.log(err);
-            return callback(null);
+            return callback(null);;
         }
         return callback(result);
     });
@@ -284,6 +212,25 @@ module.exports.getClientById = function getClientById (id, callback){
             return callback(null);;
         }
         return callback(result[0]);
+    });
+}
+
+//обновляем запись в таблице clients
+module.exports.updateClient = function updateClient (id, hostname, callback){
+    let sql = 'UPDATE clients SET hostname = ' + mySqlConnection.escape(hostname) + ' ' +
+        'WHERE id = ' + id;
+    let date;
+
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error update a record to the table Clients.');
+            console.log(err);
+            return callback(null);
+        }
+        module.exports.getClientById(id, function (result) {
+            return callback(result);
+        })
     });
 }
 
@@ -327,3 +274,69 @@ module.exports.insertIntoHosts = function insertIntoHosts (hostname, callback){
     });
 }
 
+// получаем записи из таблицы hosts с указанной позиции указанное количество
+module.exports.getHostsFromQuantity = function getHostsFromQuantity (from, quantity, callback){
+    let sql = 'SELECT * FROM hosts LIMIT ' + from + ', ' + quantity;
+    let date;
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records to the table Hosts. Function is getHostsFromQuantity ');
+            console.log(err);
+            return callback(null);;
+        }
+        return callback(result);
+    });
+}
+
+//получаем запись из таблицы hosts по id
+module.exports.getHostById = function getHostById (id, callback) {
+    let sql = 'SELECT * FROM hosts WHERE id= "' + id + '"';
+    let date;
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select a record from the table Hosts. Function is getHostById.');
+            console.log(err);
+            return callback(null);
+        }
+        return callback(result[0]);
+    });
+}
+
+//обновляем запись в таблице hosts
+module.exports.updateHost = function updateHost (id, comment, callback){
+    let sql = 'UPDATE hosts SET comment = ' + mySqlConnection.escape(comment) + ' ' +
+        'WHERE id = ' + id;
+    let date;
+
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error update a record to the table Hosts.');
+            console.log(err);
+            return callback(null);
+        }
+        module.exports.getHostById(id, function (result) {
+            return callback(result);
+        })
+    });
+}
+
+
+
+/*
+let sql = 'SELECT ' +
+        'messages.id as id, ' +
+        'messages.facility as facility, ' +
+        'messages.severity as severity, ' +
+        'DATE_FORMAT(messages.createdDate, \'%d.%m.%Y %T\') as createdDate, ' +
+        'messages.message as message, ' +
+        'hosts.hostname as hostname,' +
+        'DATE_FORMAT(messages.acknowledgedDate, \'%d.%m.%Y %T\') as acknowledgedDate, ' +
+        'messages.acknowledged, ' +
+        '(SELECT clients.hostname FROM clients WHERE messages.idClient = clients.id) as clientHostname ' +
+        'FROM messages, hosts ' +
+        'WHERE messages.idHost = hosts.id  ' +
+        'ORDER BY id DESC LIMIT ' + from + ', ' + quantity;
+ */

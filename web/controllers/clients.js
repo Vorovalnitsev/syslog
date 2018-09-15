@@ -5,13 +5,16 @@ module.exports.getClients = function getClients(req, res) {
     res.render('clients.handlebars');
 }
 
-module.exports.getNotAcknowledgedClients = function getClients(req, res) {
-    res.render('clients.handlebars');
-}
-
 //возвращаем клиентов с позиции - количество
 module.exports.getClientsFromQuantity = function getClientsFromQuantity(req,res){
     controllerClients.getClientsFromQuantity(req.params.from, req.params.quantity, function (result) {
+        res.send(result);
+    });
+}
+
+//возвращаем всех клиентов
+module.exports.getAllClients = function getAllClients(req,res){
+    controllerClients.getAllClients(function (result) {
         res.send(result);
     });
 }
@@ -31,14 +34,3 @@ module.exports.updateClient = function updateClient(req,res){
     });
 }
 
-module.exports.getNotAcknowledgedClientsFromQuantity = function getNotAcknowledgedClientsFromQuantity(req, res) {
-    controllerClients.getNotAcknowledgedClientsFromQuantity(req.params.from, req.params.quantity, function (result) {
-        res.send(result);
-    });
-}
-
-module.exports.getNotAcknowledgedClientsCount= function getNotAcknowledgedClientsCount(req, res) {
-    controllerClients.getNotAcknowledgedClientsCount(function (result) {
-        res.send({count: result});
-    });
-}

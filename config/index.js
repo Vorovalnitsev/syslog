@@ -43,3 +43,21 @@ function getSyslogSocketParameterProduction() {
 
 module.exports.getSyslogSocketParameterTest = getSyslogSocketParameterTest();
 module.exports.getSyslogSocketParameterProduction = getSyslogSocketParameterProduction();
+
+
+//Настройки для web-сервера
+
+module.exports.getWebServerParameterProduction = function getWebServerParameterProduction() {
+    return {
+        hostname: 'localhost',
+        port: '8080'
+    }
+}
+
+
+module.exports.getWebServerParameterTest = function getWebServerParameterTest() {
+    return {
+        hostname: 'localhost',
+        port: '8080'
+    }
+}
