@@ -46,7 +46,6 @@ function getRecords (){
                                     case 5: color='text-success'; break;
                                     case 6: color='text-dark'; break;
                                     case 7: color='text-secondary'; break;
-
                                 }
                                 $("#messages").append('<tr class="message ' +color+ '" id="' + item.id + '">' +
                                     '<td>' + item.id + '</td>' +
