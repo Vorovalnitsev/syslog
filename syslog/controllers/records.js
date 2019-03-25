@@ -317,7 +317,7 @@ module.exports.updateClient = function updateClient (id, hostname, callback){
 
 //получаем запись из таблицы hosts по hostname
 module.exports.getHostByHostName = function getHostByHostName (hostname, callback) {
-    let sql = 'SELECT * FROM hosts WHERE hostname= "' + hostname + '"';
+    let sql = 'SELECT * FROM hosts WHERE ip= "' + hostname + '"';
     let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
@@ -332,7 +332,7 @@ module.exports.getHostByHostName = function getHostByHostName (hostname, callbac
 
 //добавляем запись в таблицу Hosts
 module.exports.insertIntoHosts = function insertIntoHosts (hostname, callback){
-    let sql = 'INSERT INTO hosts (hostname) VALUES (' + mySqlConnection.escape(hostname) + ')';
+    let sql = 'INSERT INTO hosts (ip) VALUES (' + mySqlConnection.escape(hostname) + ')';
     let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err){
