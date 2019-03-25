@@ -59,6 +59,45 @@ module.exports.insertIntoMessages = function insertIntoMessages (idHost, facilit
 указываем диапазон записей для выборки
 */
 //возвращаем сообщения в указаном диапазоне
+module.exports.getMessages = function getMessages(callback) {
+    let sql = 'SELECT ' +
+        'messages.id as id, ' +
+        'messages.facility as facility, ' +
+        'messages.severity as severity, ' +
+        'DATE_FORMAT(messages.createdDate, \'%d.%m.%Y %T\') as createdDate, ' +
+        'messages.message as message ' +
+        'FROM messages';
+    let date;
+    
+    mySqlConnection.query(sql, function (err, result) {
+
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records. Function getMessages');
+            console.log(err);
+            return callback(null);
+        }
+        return callback(result);
+    });
+}
+//Возвразщаем количество записей в таблице
+module.exports.getMessagesQuantity = function getMessagesQuantity(callback) {
+    let sql = 'SELECT count(*) as quantity FROM messages';
+    let date;
+
+    mySqlConnection.query(sql, function (err, result) {
+
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records. Function getMessagesQuantity');
+            console.log(err);
+            return callback(null);
+        }
+        return callback(result[0]);
+    });
+}
+
+//возвращаем сообщения в указаном диапазоне
 module.exports.getMessagesFromQuantity = function getMessagesFromQuantity(from, quantity, callback) {
 
     let sql = 'SELECT ' +
@@ -67,7 +106,8 @@ module.exports.getMessagesFromQuantity = function getMessagesFromQuantity(from, 
         'messages.severity as severity, ' +
         'DATE_FORMAT(messages.createdDate, \'%d.%m.%Y %T\') as createdDate, ' +
         'messages.message as message, ' +
-        'hosts.hostname as hostname ' +
+        'hosts.hostname as hostnameHost, ' +
+        'hosts.ip as ip ' +
         'FROM messages, hosts ' +
         'WHERE messages.idHost = hosts.id  ' +
         'ORDER BY id DESC LIMIT ' + from + ', ' + quantity;
@@ -110,17 +150,40 @@ module.exports.getMessagesByIdClientFromQuantity = function getMessagesFromQuant
     });
 }
 
+//возвращаем количество сообщений для клиета по Id в таблице messages
+module.exports.getMessagesByIdClientQuantity = function getMessagesQuantity(id, callback) {
+
+    let sql = 'SELECT count (*)  as quantity ' +
+        'FROM messages ' +
+        'WHERE messages.idClient = ' + id; 
+
+    let date;
+    mySqlConnection.query(sql, function (err, result) {
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records. Function getMessagesByIdClientQuantity');
+            console.log(err);
+            return callback(null);
+        }
+        return callback(result[0]);
+    });
+}
+
 //возвращает сообщение по Id
 module.exports.getMessageById = function getMessageById (id, callback){
     let sql = 'SELECT ' +
         'messages.id as id, ' +
+        'messages.idHost as idHost, ' +
+        'hosts.ip as ip, ' +
+        '(SELECT hosts.hostname FROM hosts WHERE messages.idHost = hosts.id) as hostnameHost, ' +
         'messages.facility as facility, ' +
         'messages.severity as severity, ' +
         'DATE_FORMAT(messages.createdDate, \'%d.%m.%Y %T\') as createdDate, ' +
         'messages.message as message, ' +
-        'hosts.hostname as hostname ' +
-        'FROM messages, hosts WHERE messages.idHost = hosts.id AND messages.id = ' + id;
-    let date;
+        'messages.idClient as idClient, ' +
+        '(SELECT clients.hostname FROM clients WHERE messages.idClient = clients.id) as hostnameClient ' +
+        'FROM messages, hosts WHERE messages.id = ' + id;    
+        let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err) {
             date = new Date();
@@ -183,6 +246,23 @@ module.exports.getClientsFromQuantity = function getClientsFromQuantity (from, q
             return callback(null);;
         }
         return callback(result);
+    });
+}
+
+//Возвразщаем количество записей в таблице
+module.exports.getClientsQuantity = function getClientsQuantity(callback) {
+    let sql = 'SELECT count(*) as quantity FROM clients';
+    let date;
+
+    mySqlConnection.query(sql, function (err, result) {
+
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records. Function getClientsQuantity');
+            console.log(err);
+            return callback(null);
+        }
+        return callback(result[0]);
     });
 }
 
@@ -275,6 +355,23 @@ module.exports.insertIntoHosts = function insertIntoHosts (hostname, callback){
     });
 }
 
+//Возвразщаем количество записей в таблице
+module.exports.getHostsQuantity = function getHostsQuantity(callback) {
+    let sql = 'SELECT count(*) as quantity FROM hosts';
+    let date;
+
+    mySqlConnection.query(sql, function (err, result) {
+
+        if (err) {
+            date = new Date();
+            console.log(date + ' Syslog - Error select records. Function getHostsQuantity');
+            console.log(err);
+            return callback(null);
+        }
+        return callback(result[0]);
+    });
+}
+
 // получаем записи из таблицы hosts с указанной позиции указанное количество
 module.exports.getHostsFromQuantity = function getHostsFromQuantity (from, quantity, callback){
     let sql = 'SELECT * FROM hosts LIMIT ' + from + ', ' + quantity;
@@ -306,8 +403,8 @@ module.exports.getHostById = function getHostById (id, callback) {
 }
 
 //обновляем запись в таблице hosts
-module.exports.updateHost = function updateHost (id, comment, callback){
-    let sql = 'UPDATE hosts SET comment = ' + mySqlConnection.escape(comment) + ' ' +
+module.exports.updateHost = function updateHost (id, hostname, callback){
+    let sql = 'UPDATE hosts SET hostname = ' + mySqlConnection.escape(hostname) + ' ' +
         'WHERE id = ' + id;
     let date;
 

@@ -22,12 +22,12 @@ function getMySqlConnectionStringProduction(){
 module.exports.getMySqlConnectionStringTest = getMySqlConnectionStringTest();
 module.exports.getMySqlConnectionStringProduction = getMySqlConnectionStringProduction();
 
-//Настройки создания UDP сокеда для получения сообщений от устройств
+//Настройки создания UDP сокета для получения сообщений от устройств
 
 
 function getSyslogSocketParameterTest() {
     return {
-        address: 'localhost',
+        address: '0.0.0.0',
         port: '1514',
         exclusive: 'false'
     }
