@@ -336,7 +336,6 @@ module.exports.insertIntoHosts = function insertIntoHosts (hostname, callback){
     let date;
     mySqlConnection.query(sql, function (err, result) {
         if (err){
-            console.log('1' + result);
             if (err.code != 'ER_DUP_ENTRY'){
                 date = new Date();
                 console.log(date + ' Syslog - Error insert a record to the table Hosts.');
@@ -346,7 +345,6 @@ module.exports.insertIntoHosts = function insertIntoHosts (hostname, callback){
             if (err.code == 'ER_DUP_ENTRY')
                 module.exports.getHostByHostName(hostname, function (result) {
                     result.insertId = result.id;
-                    console.log('2' + result);
                     return callback(result);
                 });
         }

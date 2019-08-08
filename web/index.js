@@ -37,8 +37,7 @@ web.use(function (req, res, next){
     if (process.env.NODE_ENV!='production'){
         let date = new Date();
         console.log(date + ' ' + req.method + ' ' + req.url);
-
-    }        
+    }
     next();
 });
 
