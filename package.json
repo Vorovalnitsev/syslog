@@ -2,7 +2,7 @@
   "name": "syslog",
   "version": "1.0.0",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^2.6.4",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
